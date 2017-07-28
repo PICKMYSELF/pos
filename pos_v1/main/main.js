@@ -61,7 +61,7 @@ var forSale=function (arr){
 
 
 
-  var forSummary=function (object) {
+var forSummary=function (object) {
   var allItems=loadAllItems();
   var sumCarts=0;
   for(let i=0;i<object.afterArrSale.length;i++){
