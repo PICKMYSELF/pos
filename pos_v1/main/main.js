@@ -1,5 +1,15 @@
 'use strict';
-var tags=[];
+/*var tags=[]*/;
+const tags = [
+  'ITEM000001',
+  'ITEM000001',
+  'ITEM000001',
+  'ITEM000001',
+  'ITEM000001',
+  'ITEM000003-2.5',
+  'ITEM000005',
+  'ITEM000005-2',
+];
 var countForGoods=function (collection) {
   var Count=[];
   Count[0]={};
@@ -40,20 +50,20 @@ var countForGoods=function (collection) {
 
 
 var forSale=function (arr){
-  var promotions=loadPromotions().barcodes;
-  var saveNum=0;
+  var promotions=loadPromotions()[0].barcodes;
+  /*var saveNum=0;*/
   var beforeSummary={};
 
   for(let i=0;i<arr.length;i++){
     for(let j=0;j<promotions.length;j++){
       if( arr[i].name ===promotions[j]) {
-        saveNum+=parseInt(arr[i].summary/2);
-        arr[i].summaryForSale=arr[i].summary-parseInt(arr[i].summary/2);//js除法会变小数因为只有var一种数据类型
+       /* saveNum+=parseInt(arr[i].summary/2);*/
+        arr[i].summaryForSale=arr[i].summary-parseInt(arr[i].summary/3);//js除法会变小数因为只有var一种数据类型
       }
     }
   }
    beforeSummary.afterArrSale=arr;
-  beforeSummary.save =saveNum;
+ /* beforeSummary.save =saveNum;*/
   return beforeSummary;
 
 }
@@ -64,18 +74,26 @@ var forSale=function (arr){
 var forSummary=function (object) {
   var allItems=loadAllItems();
   var sumCarts=0;
+  var saveNum=0
   for(let i=0;i<object.afterArrSale.length;i++){
     for(let j=0;j<allItems.length;j++){
-      if(object.afterArrSale[i].name===allItems[j].name){
+      if(object.afterArrSale[i].name===allItems[j].barcode){
         object.afterArrSale[i].unit=allItems[j].unit;
-        object.afterArrSale[i].unitPrice=allItems[j].price;
-        if("summaryForSale" in object.afterArrSale[i]){object.afterArrSale[i].unitSumPrice=object.afterArrSale[i].unitPrice*object.afterArrSale[i].summaryForSale;}
-        else {object.afterArrSale[i].unitSumPrice=object.afterArrSale[i].unitPrice*object.afterArrSale[i].summary;}
+        object.afterArrSale[i].cName=allItems[j].name;
+        object.afterArrSale[i].unitPrice=allItems[j].price;       //赋值.00会有精度丢失，显示时直接toFixed（2）即可
+        if("summaryForSale" in object.afterArrSale[i]){
+          object.afterArrSale[i].unitSumPrice=object.afterArrSale[i].unitPrice*object.afterArrSale[i].summaryForSale;
+          saveNum+=object.afterArrSale[i].unitPrice*object.afterArrSale[i].summary-object.afterArrSale[i].unitPrice*object.afterArrSale[i].summaryForSale;
+        }
+        else {
+          object.afterArrSale[i].unitSumPrice=object.afterArrSale[i].unitPrice*object.afterArrSale[i].summary;
+        }
       sumCarts+=object.afterArrSale[i].unitSumPrice;
       }
     }
   }
    object.totalReceipt=sumCarts;
+   object.save=saveNum;
   return object;
 }
 
@@ -86,9 +104,9 @@ var printReceipt= function (){
  var receipt= forSummary(forSale(countForGoods(tags)));
  var itemReceipt='';
  for (let i=0;i<receipt.afterArrSale.length;i++){
-   itemReceipt+='名称：'+receipt.afterArrSale[i].name+'，数量：'+receipt.afterArrSale[i].summary+'瓶，单价：'+receipt.afterArrSale[i].unitPrice+'(元)，小计：'+receipt.afterArrSale[i].unitSumPrice+'(元)'+'\n';
+   itemReceipt+='名称：'+receipt.afterArrSale[i].cName+'，数量：'+receipt.afterArrSale[i].summary+receipt.afterArrSale[i].unit+'，单价：'+receipt.afterArrSale[i].unitPrice.toFixed(2)+'(元)，小计：'+receipt.afterArrSale[i].unitSumPrice.toFixed(2)+'(元)'+'\n';
  }
-var receiptString= '***<没钱赚商店>收据***'+'\n'+itemReceipt+'----------------------\n总计：'+receipt.totalReceipt+'(元)\n节省：'+receipt.save+'(元)\n**********************'
+var receiptString= '***<没钱赚商店>收据***'+'\n'+itemReceipt+'----------------------\n总计：'+receipt.totalReceipt.toFixed(2)+'(元)\n节省：'+receipt.save.toFixed(2)+'(元)\n**********************'
 console.log(receiptString);
 }
 
