@@ -18,10 +18,10 @@ describe('pos', () => {
     const dateDigitToString = num => (num < 10 ? `0${num}` : num);
 
     spyOn(console, 'log');
+    let  Cart1=new PosPrinter(tags,Promotion,Item);
+    Cart1.printPos();
 
-    printReceipt(tags);
-
-    const currentDate = new Date(),
+    let currentDate = new Date(),
       year = dateDigitToString(currentDate.getFullYear()),
       month = dateDigitToString(currentDate.getMonth() + 1),
       date = dateDigitToString(currentDate.getDate()),
